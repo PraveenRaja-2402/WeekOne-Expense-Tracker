@@ -1,4 +1,5 @@
 import express from "express";
+import { authenticate } from "../middleware/authMiddleware.js";
 import {
   createExpense,
   getExpenses,
@@ -9,19 +10,10 @@ import {
 
 const router = express.Router();
 
-// ✅ Create a new expense
-router.post("/", createExpense);
-
-// ✅ Get all expenses (supports pagination + filters)
+router.post("/", authenticate,createExpense);
 router.get("/", getExpenses);
-
-// ✅ Get a single expense by ID
 router.get("/:id", getExpenseById);
-
-// ✅ Update expense by ID
-router.put("/:id", updateExpense);
-
-// ✅ Delete expense by ID
-router.delete("/:id", deleteExpense);
+router.put("/:id",authenticate, updateExpense);
+router.delete("/:id", authenticate, deleteExpense);
 
 export default router;

@@ -9,12 +9,15 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  email     String    @unique
-  createdAt DateTime  @default(now())
+  email     String   @unique
+  password String @default("temp123")
+  role      String   @default("user") // can be "user" or "admin"
+  createdAt DateTime @default(now())
   expenses  Expense[]
 }
+
 
 model Category {
   id        String    @id @default(uuid())
