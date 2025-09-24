@@ -19,41 +19,34 @@ export const createExpense = async (req, res) => {
   }
 };
 
-// ✅ Get Expenses (pagination + filters)
+// src/controllers/expenseController.js
 export const getExpenses = async (req, res) => {
   try {
-    const { page = 1, limit = 10, category, date } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
+    const { categoryId, startDate, endDate, page = 1, limit = 10, sortBy = "date", order = "desc", search } = req.query;
 
-    const where = {};
+    const where = { userId: req.user.userId }; // only user’s expenses
 
-    if (category) {
-      where.category = { name: { equals: category, mode: "insensitive" } };
+    if (categoryId) where.categoryId = categoryId;
+    if (startDate && endDate) {
+      where.date = { gte: new Date(startDate), lte: new Date(endDate) };
     }
-    if (date && !isNaN(Date.parse(date))) {
-      const parsedDate = new Date(date);
-      where.date = {
-        gte: parsedDate,
-        lt: new Date(parsedDate.setDate(parsedDate.getDate() + 1)),
-      };
+    if (search) {
+      where.description = { contains: search, mode: "insensitive" };
     }
 
-    const [total, expenses] = await Promise.all([
-      prisma.expense.count({ where }),
-      prisma.expense.findMany({
-        skip,
-        take: Number(limit),
-        where,
-        include: { user: true, category: true },
-        orderBy: { date: "desc" },
-      }),
-    ]);
+    const expenses = await prisma.expense.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: parseInt(limit),
+      orderBy: { [sortBy]: order },
+    });
 
-    res.json({ page: Number(page), limit: Number(limit), total, expenses });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json(expenses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
+
 
 // ✅ Get Expense by ID
 export const getExpenseById = async (req, res) => {

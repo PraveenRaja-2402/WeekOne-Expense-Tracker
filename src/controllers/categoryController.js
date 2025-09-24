@@ -19,6 +19,26 @@ export const createCategory = async (req, res) => {
   }
 };
 
+ 
+export const getCategoriesById = async (req, res) => {
+  try {
+    const {id } = categoryIdSchema.parse(req.params);
+
+    const category = await prisma.category.findUnique({
+      where: { id },
+    });
+
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    res.json(category);
+  } catch (error) {
+    res.status(400).json({ error: error.errors || error.message });
+  }
+};
+
+
 // Get All Categories
 export const getCategories = async (req, res) => {
   try {

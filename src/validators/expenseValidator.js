@@ -1,4 +1,3 @@
-// src/validators/expenseValidator.js
 import { z } from "zod";
 
 export const expenseSchema = z.object({
@@ -19,4 +18,16 @@ export const expenseUpdateSchema = z.object({
 
 export const expenseIdSchema = z.object({
   id: z.string().uuid("Invalid expense ID"),
+});
+
+// Add your query validator here
+export const expenseQuerySchema = z.object({
+  categoryId: z.string().uuid().optional(),
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+  page: z.string().regex(/^\d+$/).transform(Number).default("1"),
+  limit: z.string().regex(/^\d+$/).transform(Number).default("10"),
+  sortBy: z.enum(["date", "amount"]).default("date"),
+  order: z.enum(["asc", "desc"]).default("desc"),
+  search: z.string().optional(),
 });
