@@ -8,7 +8,10 @@ export const createUser = async (req, res) => {
     const parsed = userSchema.parse(req.body);
 
     const user = await prisma.user.create({
-      data: parsed,
+      data: {
+        ...parsed,
+        role: parsed.role || "user", // default role is "user"
+      },
     });
 
     res.json(user);
@@ -16,6 +19,7 @@ export const createUser = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 export const getUsers = async (req, res) => {
   const users = await prisma.user.findMany();

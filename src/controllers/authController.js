@@ -48,7 +48,7 @@ export const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    console.log("Token :",token)
+    
 
     res.json({ token, expiresIn: "1h" });
   } catch (err) {
